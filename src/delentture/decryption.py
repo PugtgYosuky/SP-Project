@@ -2,6 +2,7 @@ from Crypto.Util import Counter
 from Crypto.Cipher import AES
 import pandas as pd
 from io import StringIO
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
 class Decryption:
@@ -16,3 +17,16 @@ class Decryption:
         ct = self.communication.get_bytes(filename)
         decrypted = aes.decrypt(ct)
         return pd.read_csv(StringIO(decrypted.decode('utf-8')))
+
+    def decrypt_authenticated(self, filename):
+        nonce = self.communication.get_bytes('nonce')
+        ct = self.communication.get_bytes(filename)
+        
+        try:
+            aesgcm = AESGCM(self.key)
+            decrypted = aesgcm.decrypt(nonce, ct, None)
+            return pd.read_csv(StringIO(decrypted.decode('utf-8')))
+            
+        except:
+            print("Error")
+            return None
