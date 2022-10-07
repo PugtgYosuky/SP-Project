@@ -35,6 +35,7 @@ class CommunicationViaJson():
         self.send_information()
 
     def get_value(self, variable):
+        self.receive_information()
         if variable in self.data:
             return self.data[variable]
         else:
