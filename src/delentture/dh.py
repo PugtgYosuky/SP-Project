@@ -6,21 +6,31 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
+# Diffie-Hellman algorithm
 class DH:
     def __init__(self, communication):
+        """
+        Generates a public and private key with the parameters P, G received
+        
+        :param communication: Ta class that handles the communication between the two parties
+        """
         self.communication = communication
-        # generate key
+        # generate keys
         p_key = self.communication.get_value('P')
         g_key = self.communication.get_value('G')
         self.pn_key = dh.DHParameterNumbers(p_key, g_key)
         self.parameters_key = self.pn_key.parameters()
         self.private_key = self.parameters_key.generate_private_key()
         self.public_key = self.private_key.public_key()
-        #write value
+        #send public key
         self.communication.write_bytes(self.public_key.public_bytes(encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo), 'DHdelentture')
 
 
     def calculate_private_key(self):
+        """
+        Calculate a shared secret between the two parties
+        :return: The common private key.
+        """
         decoded = self.communication.get_bytes('DHcontrol')
         other_public_key = load_pem_public_key(decoded)
         algorithm = hashes.SHA256() # TODO: change algorithm
