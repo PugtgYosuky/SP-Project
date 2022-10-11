@@ -28,7 +28,7 @@ class Decryption:
         :return: A pandas dataframe
         """
         # Reading the iv used to encrypt the file
-        iv = self.communication.get_value('iv')
+        iv = self.communication.get_value(f'iv_{filename}')
         # Creating a new counter object with the specified counter size and initial value.
         counter = Counter.new(counter_size, initial_value=iv)    
         # Creating a new AES object with the specified key, mode and counter.
@@ -48,7 +48,7 @@ class Decryption:
         :return: A pandas dataframe
         """
         # Getting the nonce from the communication object.
-        nonce = self.communication.get_bytes('nonce')
+        nonce = self.communication.get_bytes(f'nonce_{filename}')
         # Getting the bytes of the file that is to be decrypted.
         ct = self.communication.get_bytes(filename)
         try:
