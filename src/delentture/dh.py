@@ -17,32 +17,43 @@ class DH:
         self.communication = communication
         # generate keys
         p_key = self.communication.get_value('P')
+        if p_key is None:
+            print("Could not find value P")
+            return
         g_key = self.communication.get_value('G')
-        self.pn_key = dh.DHParameterNumbers(p_key, g_key)
-        self.parameters_key = self.pn_key.parameters()
-        self.private_key = self.parameters_key.generate_private_key()
-        self.public_key = self.private_key.public_key()
-        #send public key
-        self.communication.write_bytes(self.public_key.public_bytes(encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo), 'DHdelentture')
-
+        if k_key is None:
+            print("Could not find value G")
+            return
+        try:
+            self.pn_key = dh.DHParameterNumbers(p_key, g_key)
+            self.parameters_key = self.pn_key.parameters()
+            self.private_key = self.parameters_key.generate_private_key()
+            self.public_key = self.private_key.public_key()
+            #send public key
+            self.communication.write_bytes(self.public_key.public_bytes(encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo), 'DHdelentture')
+        except:
+            print("Error generating keys")
 
     def calculate_private_key(self):
         """
         Calculate a shared secret between the two parties
-        :return: The common private key.
+        :return: The common private key or None if an error occurred
         """
         decoded = self.communication.get_bytes('DHcontrol')
-        other_public_key = load_pem_public_key(decoded)
-        algorithm = hashes.SHA256() # TODO: change algorithm
-        if other_public_key:
+        if decoded is None:
+            return None
+        try:
+            other_public_key = load_pem_public_key(decoded)
+            algorithm = hashes.SHA256() # TODO: change algorithm
             self.shared_secret = self.private_key.exchange(other_public_key)
             self.common_private_key = HKDF(
                 algorithm = algorithm, 
                 length=32,
-                salt=None,
+                salt=None, 
                 info=b'handshake data',
                 backend=default_backend()
             ).derive(self.shared_secret)
             return self.common_private_key
-            
-        return None
+        except:   
+            print("Error calculating the private shared key")
+            return None

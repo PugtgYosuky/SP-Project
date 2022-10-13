@@ -30,20 +30,24 @@ class DH:
     def calculate_private_key(self):
         """
         Calculate a shared secret between the two parties
-        :return: The common private key.
+        :return: The common private key or None if an error occurred
         """
         decoded = self.communication.get_bytes('DHdelentture')
-        other_public_key = load_pem_public_key(decoded)
-        algorithm = hashes.SHA256() # TODO: change algorithm
-        if other_public_key:
+        if decoded is None:
+            return None
+        try:
+            other_public_key = load_pem_public_key(decoded)
+            algorithm = hashes.SHA256() # TODO: change algorithm
             self.shared_secret = self.private_key.exchange(other_public_key)
             self.common_private_key = HKDF(
                 algorithm = algorithm, 
                 length=32,
                 salt=None, 
-                info=b'handshake data', # ! o que é suposto ser aqui
+                info=b'handshake data',
                 backend=default_backend()
             ).derive(self.shared_secret)
-            return self.common_private_key   
-        return None
+            return self.common_private_key
+        except:   
+            print("Error calculating the private shared key")
+            return None
 

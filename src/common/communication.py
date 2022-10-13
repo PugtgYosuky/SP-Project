@@ -2,7 +2,7 @@ import os
 import json
 
 # Communication class - exchanges messages between the two parties
-class CommunicationViaJson():
+class Communication():
     def __init__(self):
         # Initializing of the communication class - the communication is made using files (json and binary files)
 
@@ -71,7 +71,11 @@ class CommunicationViaJson():
         :param description: the name of the file
         """
         path = os.path.join(self.save_path, description)
-        with open(path, 'rb') as file:
-            byte_array = file.read()
-            file.close()
-        return byte_array
+        if os.path.exists(path):
+            with open(path, 'rb') as file:
+                byte_array = file.read()
+                file.close()
+            return byte_array
+        else:
+            print(f"Could not found file{description}")
+            return None

@@ -25,32 +25,47 @@ class Decryption:
         :param filename: the name of the file to be decrypted
         :param counter_size: The size of the counter in bits. The default is 128 bits, defaults to 128
         (optional)
-        :return: A pandas dataframe
+        :return: A pandas dataframe or None in case of error
         """
         # Reading the iv used to encrypt the file
         iv = self.communication.get_value(f'iv_{filename}')
-        # Creating a new counter object with the specified counter size and initial value.
-        counter = Counter.new(counter_size, initial_value=iv)    
-        # Creating a new AES object with the specified key, mode and counter.
-        aes = AES.new(key=self.key, mode=AES.MODE_CTR, counter=counter)
-        # Getting the bytes of the file that is to be decrypted.
-        ct = self.communication.get_bytes(filename)
-        # Decrypting the ciphertext using the AES object.
-        decrypted = aes.decrypt(ct)
-        # Converting the decrypted bytes to a pandas dataframe.
-        return pd.read_csv(StringIO(decrypted.decode('utf-8')))
+        if iv is None:
+            print("Could not find iv")
+            return None
+        
+        try:
+            # Creating a new counter object with the specified counter size and initial value.
+            counter = Counter.new(counter_size, initial_value=iv)    
+            # Creating a new AES object with the specified key, mode and counter.
+            aes = AES.new(key=self.key, mode=AES.MODE_CTR, counter=counter)
+            # Getting the bytes of the file that is to be decrypted.
+            ct = self.communication.get_bytes(filename)
+            # Decrypting the ciphertext using the AES object.
+            decrypted = aes.decrypt(ct)
+            # Converting the decrypted bytes to a pandas dataframe.
+            return pd.read_csv(StringIO(decrypted.decode('utf-8')))
+        except:
+            print("Error decrypting file")
+            return None
+           
 
     def decrypt_authenticated(self, filename):
         """
         Decrypts a file using AES in GCM mode (authenticated)
         
         :param filename: The name of the file to be decrypted
-        :return: A pandas dataframe
+        :return: A pandas dataframe or None in case of error
         """
         # Getting the nonce from the communication object.
         nonce = self.communication.get_bytes(f'nonce_{filename}')
+        if nonce is None:
+            print("Could not find nonce")
+            return None
         # Getting the bytes of the file that is to be decrypted.
         ct = self.communication.get_bytes(filename)
+        if ct is None:
+            print("Could not find the encryption file")
+            return None
         try:
             # Creating a new AESGCM object with the specified key.
             aesgcm = AESGCM(self.key)
@@ -60,5 +75,5 @@ class Decryption:
             return pd.read_csv(StringIO(decrypted.decode('utf-8')))
             
         except:
-            print("Error")
+            print("Error decrypting file")
             return None
