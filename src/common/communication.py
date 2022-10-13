@@ -32,7 +32,7 @@ class Communication():
             input.close()
 
     
-    def add_value(self, variable, new_value):
+    def add_value(self, new_value, variable):
         """
         A function that adds (or changes) a value of a variable in the data and writes it into a json file
 

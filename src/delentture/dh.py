@@ -16,16 +16,16 @@ class DH:
         """
         self.communication = communication
         # generate keys
-        p_key = self.communication.get_value('P')
-        if p_key is None:
+        p = self.communication.get_value('P')
+        if p is None:
             print("Could not find value P")
             return
-        g_key = self.communication.get_value('G')
-        if k_key is None:
+        g = self.communication.get_value('G')
+        if g is None:
             print("Could not find value G")
             return
         try:
-            self.pn_key = dh.DHParameterNumbers(p_key, g_key)
+            self.pn_key = dh.DHParameterNumbers(p, g)
             self.parameters_key = self.pn_key.parameters()
             self.private_key = self.parameters_key.generate_private_key()
             self.public_key = self.private_key.public_key()

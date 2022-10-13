@@ -22,8 +22,8 @@ class DH:
         self.private_key = self.parameters_key.generate_private_key()
         self.public_key = self.private_key.public_key()
         # sends the public values to the other party
-        self.communication.add_value('P', self.parameters_key.parameter_numbers().p)
-        self.communication.add_value('G', self.parameters_key.parameter_numbers().g)
+        self.communication.add_value(self.parameters_key.parameter_numbers().p, 'P')
+        self.communication.add_value(self.parameters_key.parameter_numbers().g, 'G')
         self.communication.write_bytes(self.public_key.public_bytes(encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo), 'DHcontrol')
 
 

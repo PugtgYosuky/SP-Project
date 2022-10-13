@@ -37,7 +37,7 @@ class Encryption:
         try:
             # generating iv and send it
             iv = getRandomNBitInteger(counter_size)
-            self.communication.add_value(iv, f'iv_{name}')
+            self.communication.add_value(iv, f'iv_{name}',)
             # Creating a counter object with the given counter size and initial value.
             counter = Counter.new(counter_size, initial_value=iv)
             # Creating a new AES object with the given key, mode and counter.
