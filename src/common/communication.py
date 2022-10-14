@@ -1,3 +1,9 @@
+"""
+Authors:
+- Joana Simoes, n.º 2019217013
+- Tomas Ferreira, n.º 2019224786
+"""
+
 import os
 import json
 

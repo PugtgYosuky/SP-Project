@@ -1,3 +1,9 @@
+"""
+Authors:
+- Joana Simoes, n.º 2019217013
+- Tomas Ferreira, n.º 2019224786
+"""
+
 from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.serialization import Encoding
@@ -5,6 +11,7 @@ from cryptography.hazmat.primitives.serialization import PublicFormat
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
+import time
 
 # Diffie-Hellman algorithm
 class DH:
@@ -25,10 +32,13 @@ class DH:
             print("Could not find value G")
             return
         try:
+            start_time = time.time()
             self.pn_key = dh.DHParameterNumbers(p, g)
             self.parameters_key = self.pn_key.parameters()
             self.private_key = self.parameters_key.generate_private_key()
             self.public_key = self.private_key.public_key()
+            end_time = time.time()
+            print(f"Generate keys in {round(end_time - start_time)*10**3} ms")
             #send public key
             self.communication.write_bytes(self.public_key.public_bytes(encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo), 'DHdelentture')
         except:

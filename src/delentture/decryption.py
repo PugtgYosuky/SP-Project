@@ -1,9 +1,16 @@
+"""
+Authors:
+- Joana Simoes, n.º 2019217013
+- Tomas Ferreira, n.º 2019224786
+"""
+
 # Importing the libraries that are needed for the decryption
 from Crypto.Util import Counter
 from Crypto.Cipher import AES
 import pandas as pd
 from io import StringIO
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import time
 
 
 #This class is used to decrypt a file using AES in CTR mode or AES-GCM mode
@@ -41,7 +48,10 @@ class Decryption:
             # Getting the bytes of the file that is to be decrypted.
             ct = self.communication.get_bytes(filename)
             # Decrypting the ciphertext using the AES object.
+            start_time = time.time()
             decrypted = aes.decrypt(ct)
+            end_time = time.time()
+            print(f'Time to decrypt: {(end_time-start_time)*10**3} ms')
             # Converting the decrypted bytes to a pandas dataframe.
             return pd.read_csv(StringIO(decrypted.decode('utf-8')))
         except:
@@ -62,7 +72,7 @@ class Decryption:
             print("Could not find nonce")
             return None
         # Getting the bytes of the file that is to be decrypted.
-        ct = self.communication.get_bytes(filename)
+        ct = self.communication.get_bytes(f'{filename}_authenticated')
         if ct is None:
             print("Could not find the encryption file")
             return None
@@ -70,7 +80,10 @@ class Decryption:
             # Creating a new AESGCM object with the specified key.
             aesgcm = AESGCM(self.key)
             # Decrypting the ciphertext using the AESGCM
+            start_time = time.time()
             decrypted = aesgcm.decrypt(nonce, ct, None)
+            end_time = time.time()
+            print(f'Time to decrypt: {(end_time-start_time)*10**3} ms')
             # Converting the decrypted bytes to a pandas dataframe.
             return pd.read_csv(StringIO(decrypted.decode('utf-8')))
             

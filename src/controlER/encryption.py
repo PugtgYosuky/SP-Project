@@ -1,3 +1,9 @@
+"""
+Authors:
+- Joana Simoes, n.º 2019217013
+- Tomas Ferreira, n.º 2019224786
+"""
+
 # Importing the libraries that are needed for the encryption.
 from Crypto.Util import Counter
 from Crypto.Cipher import AES
@@ -5,6 +11,7 @@ from Crypto.Util.number import getRandomNBitInteger
 import os
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from Crypto.Random import get_random_bytes
+import time
 
 # This class is used to encrypt a file using AES in CTR mode or AES-GCM mode
 class Encryption:
@@ -45,7 +52,10 @@ class Encryption:
             # Opening the file, reading the data, encrypting it and then closing the file.
             with open(file_path, 'rb') as file:
                 csv_data = file.read()
+                start_time = time.time()
                 encrypted_data = aes.encrypt(csv_data)
+                end_time = time.time()
+                print(f'Time to encrypt: {(end_time-start_time)*10**3} ms')
                 file.close()
             # Sending the encrypted data
             self.communication.write_bytes(encrypted_data, name)
@@ -75,10 +85,13 @@ class Encryption:
             # Opening the file, reading the data, encrypting it and then closing the file.
             with open(file_path, 'rb') as file:
                 csv_data = file.read()
+                start_time = time.time()
                 encrypted_data = aesgcm.encrypt(nonce, csv_data, None)
+                end_time = time.time()
+                print(f'Time to encrypt: {(end_time-start_time)*10**3} ms')
                 file.close()
 
             # Sending the encrypted data
-            self.communication.write_bytes(encrypted_data, name)
+            self.communication.write_bytes(encrypted_data, f'{name}_authenticated')
         except:
             print("Failed to encrypt file")
